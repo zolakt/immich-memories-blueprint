@@ -100,8 +100,8 @@ Memory from {{memory_year}}
 ```
 
 This would produce a notification like:
-> Memory from 2020  
-> On this day 5 years ago
+
+<img width="420" height="351" alt="image" src="https://github.com/user-attachments/assets/193ccf91-6d43-4f53-926b-e778d3bcca57" />
 
 ## Known limitations
 1. Immich hasn't yet implemented deep links for the mobile app. Therefore, when you click on the notification, it can't take you directly to the Immich app and open that memory. The issue is tracked here: https://github.com/immich-app/immich/discussions/2881. Once this is implemented, you can replace your **Immich UI URL** with something like `immich://` and it should work. Currently, clicking the notification will open the memory in the browser (not the app)
