@@ -116,6 +116,14 @@ blueprint:
       default: ""
       selector:
         icon:
+    notification_channel:
+      name: Notification Channel
+      description: |
+        Optional. The channel to use for the notification (Android only).
+        NOTE: channel needs to be configured for the Home Assistant app, not Immich app.
+      default: ""
+      selector:
+        text:
 
 trigger:
   - platform: time
@@ -131,6 +139,7 @@ action:
       memory_selection_mode: !input memory_selection_mode
       asset_selection_mode: !input asset_selection_mode
       notification_icon: !input notification_icon
+      notification_channel: !input notification_channel
   - action: rest_command.immich_get_memories
     data:
       api_url: "{{ api_url }}"
@@ -206,5 +215,6 @@ action:
               image: "{{ thumbnail_url if include_image and selected_asset  != 'none' else omit }}"
               clickAction: "{{ deep_link }}"
               notification_icon: "{{ notification_icon if notification_icon | length > 0 else omit }}"
+              channel: "{{ notification_channel if notification_channel | length > 0 else omit }}"
 
 mode: single
