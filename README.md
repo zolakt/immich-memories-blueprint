@@ -23,6 +23,7 @@
   - `{{years_ago_label}}` — "year" or "years"  
   - `{{memory_year}}` — Year of the memory
 - Customizable icon
+- Customizable notification channel (for Android)
 - If no memory exists for the current date, no notification will be sent.
 
 ---
@@ -73,7 +74,7 @@ Alternatively, if the above button doesn't work:
 |---------------------------|-----------------------------------------------------------------------------|
 | **Immich API URL**        | Base URL of your Immich server (e.g., `http://10.0.0.5:2283`)               |
 | **Immich API Key**        | API key with proper permissions                                             |
-| **Immich UI URL**         | Optional URL for UI links. Can choose between Android App, iOS app, a custom web URL or can be left empty to use the API URL. (default: Android App)              |
+| **Immich UI URL**         | Optional URL for UI links. Can choose between Android App, iOS app, a custom web URL or can be left empty to use the API URL. (default: Android App)      |
 | **Notify Target**         | Mobile device to receive notifications (e.g., `notify.mobile_app_myphone`) |
 | **Time of Day**           | Time to send the daily notification (default: `09:00:00`)                   |
 | **Include Thumbnail**     | Whether to include the memory image (default: true)                         |
@@ -82,6 +83,7 @@ Alternatively, if the above button doesn't work:
 | **Message Template**      | Custom notification message. Supports placeholders                          |
 | **Title Template**        | Optional custom title. Supports placeholders                                |
 | **Notification Icon**     | Optional icon (e.g., `mdi:camera`)                                          |
+| **Notification Channel**  | Optional. The channel to use for the notification (Android only). NOTE: channel needs to be configured for the Home Assistant app, not Immich app.        |
 
 ### Placeholders
 The following placeholders are available:
