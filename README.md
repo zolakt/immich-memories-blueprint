@@ -112,3 +112,7 @@ This would produce a notification like:
 ## Notes
 - I only tested this on Android. It should work on iOS as well, although I provide no guarantees or support for it
 - PRs welcome
+
+---
+
+<a href='https://ko-fi.com/E1E41N87EI' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi5.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
