@@ -28,11 +28,21 @@ blueprint:
       description: API key with `memory.read` and `asset.view` permissions.
       default: ""
     immich_ui_url:
-      name: Immich UI URL
+      name: Immich UI URL / Mode
       description: |
-        Optional UI URL for the Immich app. Can be the same as the API URL, a reverse proxy address, or a custom app schema if supported.
-        If empty, the API URL will be used.
-      default: false
+        Choose how the notification opens Immich.
+
+        - Android App → opens via deep link (`deep-link://immich://…`)
+        - OS App → opens via deep link (`immich://…`)
+        - Or type a custom full URL (e.g. `https://immich.home.lan`)
+        - Leave empty to use the API URL instead
+      default: Android App
+      selector:
+        select:
+          options:
+            - Android App
+            - iOS App
+          custom_value: true
     notify_target:
       name: Notify Target
       description: Target device for the notification, e.g., `notify.mobile_app_myphone`.
@@ -167,7 +177,15 @@ action:
         {% endif %}
       deep_link: >-
         {% if selected_memory and selected_memory.id is defined %}
-          {{ ui_url if ui_url else api_url }}/memory?id={{ selected_memory.id }}
+          {% if ui_url == 'Android App' %}
+            deep-link://immich://memory?id={{ selected_memory.id }}
+          {% elif ui_url == 'iOS App' %}
+            immich://memory?id={{ selected_memory.id }}
+          {% elif ui_url | length > 0 %}
+            {{ ui_url }}/memory?id={{ selected_memory.id }}
+          {% else %}
+            {{ api_url }}/memory?id={{ selected_memory.id }}
+          {% endif %}
         {% endif %}
       years_ago: "{{ now().year - selected_memory.data.year if selected_memory != none else 0 }}"
       years_ago_label: "{{ 'year' if (years_ago|int) == 1 else 'years' }}"
