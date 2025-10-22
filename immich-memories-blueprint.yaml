@@ -1,0 +1,190 @@
+blueprint:
+  name: Immich Memories
+  description: |
+    Sends a daily push notification with a random memory from past years on this calendar day.
+
+    ### Requirements
+    Add the following to your `configuration.yaml`:
+    
+    ```yaml
+    rest_command:
+      immich_get_memories:
+        url: "{{ api_url }}/api/memories?for={{ now().strftime('%Y-%m-%dT00:00:00.000Z') }}"
+        method: GET
+        headers:
+          Accept: "application/json"
+          x-api-key: "{{ api_key }}"
+    ```
+  domain: automation
+  input:
+    immich_api_url:
+      name: Immich API URL
+      description: |
+        The base URL of your Immich server.
+        Example: `https://immich.example.com` or `http://10.0.0.5:2283`
+      default: ""
+    immich_api_key:
+      name: Immich API Key
+      description: API key with `memory.read` and `asset.view` permissions.
+      default: ""
+    immich_ui_url:
+      name: Immich UI URL
+      description: |
+        Optional UI URL for the Immich app. Can be the same as the API URL, a reverse proxy address, or a custom app schema if supported.
+        If empty, the API URL will be used.
+      default: false
+    notify_target:
+      name: Notify Target
+      description: Target device for the notification, e.g., `notify.mobile_app_myphone`.
+      default: false
+      selector:
+        device:
+          filter:
+            integration: mobile_app
+    time_of_day:
+      name: Time of Day
+      description: Time to send the daily memory notification.
+      default: "09:00:00"
+      selector:
+        time:
+    include_image:
+      name: Include Thumbnail
+      description: Include the memory thumbnail in the notification if available.
+      default: true
+      selector:
+        boolean:
+    memory_selection_mode:
+      name: Memory Selection Mode
+      description: How to select which memory to display.
+      default: random
+      selector:
+        select:
+          options:
+            - random
+            - newest
+            - oldest
+    asset_selection_mode:
+      name: Asset Selection Mode
+      description: How to select which image within the memory to display.
+      default: random
+      selector:
+        select:
+          options:
+            - random
+            - newest
+            - oldest
+    message_template:
+      name: Message Template
+      description: |
+        Customize the notification message.
+        Available placeholders:
+          - {{years_ago}}       → Number of years since the memory
+          - {{years_ago_label}} → "year" or "years"
+          - {{memory_year}}     → Year of the memory
+      default: "On this day {{years_ago}} {{years_ago_label}} ago"
+      selector:
+        text:
+    title_template:
+      name: Title Template
+      description: |
+        Optional. Customize the notification title.
+        Available placeholders:
+          - {{years_ago}}       → Number of years since the memory
+          - {{years_ago_label}} → "year" or "years"
+          - {{memory_year}}     → Year of the memory
+      default: ""
+      selector:
+        text:
+    notification_icon:
+      name: Notification Icon
+      description: |
+        Optional icon for the notification.
+        Example: `mdi:camera`, `mdi:image-outline`, `mdi:memory`.
+        Leave empty to use the app default icon.
+      default: ""
+      selector:
+        icon:
+
+trigger:
+  - platform: time
+    at: !input time_of_day
+
+action:
+  - variables:
+      api_url: !input immich_api_url
+      api_key: !input immich_api_key
+      ui_url: !input immich_ui_url
+      target: !input notify_target
+      include_image: !input include_image
+      memory_selection_mode: !input memory_selection_mode
+      asset_selection_mode: !input asset_selection_mode
+      notification_icon: !input notification_icon
+  - action: rest_command.immich_get_memories
+    data:
+      api_url: "{{ api_url }}"
+      api_key: "{{ api_key }}"
+    response_variable: memories_response
+  - variables:
+      memory_list: "{{ memories_response.content if memories_response.content is defined else [] }}"
+      sorted_memories: >-
+        {% if memory_selection_mode == 'newest' %}
+          {{ memory_list | sort(attribute='data.year', reverse=true) }}
+        {% elif memory_selection_mode == 'oldest' %}
+          {{ memory_list | sort(attribute='data.year') }}
+        {% else %}
+          {{ memory_list }}
+        {% endif %}
+      selected_memory: >-
+        {% if sorted_memories | length == 0 %}
+          none
+        {% elif memory_selection_mode == 'random' %}
+          {{ sorted_memories | random }}
+        {% else %}
+          {{ sorted_memories[0] }}
+        {% endif %}
+      selected_assets: "{{ selected_memory.assets if selected_memory and selected_memory.assets is defined else [] }}"
+      sorted_assets: >-
+        {% if asset_selection_mode == 'newest' %}
+          {{ selected_assets | sort(attribute='fileCreatedAt', reverse=true) }}
+        {% elif asset_selection_mode == 'oldest' %}
+          {{ selected_assets | sort(attribute='fileCreatedAt') }}
+        {% else %}
+          {{ selected_assets }}
+        {% endif %}
+      selected_asset: >-
+        {% if sorted_assets | length == 0 %}
+          none
+        {% elif asset_selection_mode == 'random' %}
+          {{ sorted_assets | random }}
+        {% else %}
+          {{ sorted_assets[0] }}
+        {% endif %}
+      thumbnail_url: >-
+        {% if selected_asset  != 'none' %}
+          {{ api_url }}/api/assets/{{ selected_asset.id }}/thumbnail?apiKey={{ api_key }}
+        {% else %}
+          ''
+        {% endif %}
+      deep_link: >-
+        {% if selected_memory and selected_memory.id is defined %}
+          {{ ui_url if ui_url else api_url }}/memory?id={{ selected_memory.id }}
+        {% endif %}
+      years_ago: "{{ now().year - selected_memory.data.year if selected_memory != none else 0 }}"
+      years_ago_label: "{{ 'year' if (years_ago|int) == 1 else 'years' }}"
+      memory_year: "{{ selected_memory.data.year if selected_memory != none else '' }}"
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ selected_memory != none }}"
+        sequence:
+          - device_id: !input notify_target
+            domain: mobile_app
+            type: notify
+            message: !input message_template
+            title: !input title_template
+            data:
+              image: "{{ thumbnail_url if include_image and selected_asset  != 'none' else omit }}"
+              clickAction: "{{ deep_link }}"
+              notification_icon: "{{ notification_icon if notification_icon | length > 0 else omit }}"
+
+mode: single
