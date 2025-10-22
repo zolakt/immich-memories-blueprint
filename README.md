@@ -73,7 +73,7 @@ Alternatively, if the above button doesn't work:
 |---------------------------|-----------------------------------------------------------------------------|
 | **Immich API URL**        | Base URL of your Immich server (e.g., `http://10.0.0.5:2283`)               |
 | **Immich API Key**        | API key with proper permissions                                             |
-| **Immich UI URL**         | Optional URL for UI links. Defaults to API URL if left blank.               |
+| **Immich UI URL**         | Optional URL for UI links. Can choose between Android App, iOS app, a custom web URL or can be left empty to use the API URL. (default: Android App)              |
 | **Notify Target**         | Mobile device to receive notifications (e.g., `notify.mobile_app_myphone`) |
 | **Time of Day**           | Time to send the daily notification (default: `09:00:00`)                   |
 | **Include Thumbnail**     | Whether to include the memory image (default: true)                         |
@@ -104,9 +104,8 @@ This would produce a notification like:
 <img width="420" height="351" alt="image" src="https://github.com/user-attachments/assets/193ccf91-6d43-4f53-926b-e778d3bcca57" />
 
 ## Known limitations
-1. Immich hasn't yet implemented deep links for the mobile app. Therefore, when you click on the notification, it can't take you directly to the Immich app and open that memory. The issue is tracked here: https://github.com/immich-app/immich/discussions/2881. Once this is implemented, you can replace your **Immich UI URL** with something like `immich://` and it should work. Currently, clicking the notification will open the memory in the browser (not the app)
-2. There might be some issues in passing requests to the Immich API through a reverse proxy. Therefore it is recommened to use ip:port for **Immich API URL**, e.g. `http://10.0.0.5:2283`. It is fine to use the reverse proxy address for **Immich UI URL**, e.g. `https://immich.home.lan`, so it opens the UI with the cleaner URL
-3. Immich HA integration doesn't expose an action for fetching memories. Therefore, you need to add the **rest_command** manually to get around this. If they do add this action, I'll remove the **rest_command** and modify the logic so it uses the integration action
+1. There might be some issues in passing requests to the Immich API through a reverse proxy. Therefore it is recommened to use ip:port for **Immich API URL**, e.g. `http://10.0.0.5:2283`. It is fine to use the reverse proxy address for **Immich UI URL**, e.g. `https://immich.home.lan`, so it opens the UI with the cleaner URL
+2. Immich HA integration doesn't expose an action for fetching memories. Therefore, you need to add the **rest_command** manually to get around this. If they do add this action, I'll remove the **rest_command** and modify the logic so it uses the integration action
 
 ## Notes
 - I only tested this on Android. It should work on iOS as well, although I provide no guarantees or support for it
