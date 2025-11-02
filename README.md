@@ -72,7 +72,7 @@ Alternatively, if the above button doesn't work:
 ## Configuration
 | Input                     | Description                                                                 |
 |---------------------------|-----------------------------------------------------------------------------|
-| **Immich API URL**        | Base URL of your Immich server (e.g., `http://10.0.0.5:2283`)               |
+| **Immich API URL**        | Base URL of your Immich server (e.g., `http://10.0.0.5:2283`, with no trailing slash)      |
 | **Immich API Key**        | API key with proper permissions                                             |
 | **Immich UI URL**         | Optional URL for UI links. Can choose between Android App, iOS app, a custom web URL or can be left empty to use the API URL. (default: Android App)      |
 | **Notify Target**         | Mobile device to receive notifications (e.g., `notify.mobile_app_myphone`) |
