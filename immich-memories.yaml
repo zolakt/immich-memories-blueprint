@@ -214,6 +214,7 @@ action:
             data:
               image: "{{ thumbnail_url if include_image and selected_asset  != 'none' else omit }}"
               clickAction: "{{ deep_link }}"
+              url: "{{ deep_link }}"
               notification_icon: "{{ notification_icon if notification_icon | length > 0 else omit }}"
               channel: "{{ notification_channel if notification_channel | length > 0 else omit }}"
 
