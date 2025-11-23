@@ -107,6 +107,18 @@ blueprint:
       default: ""
       selector:
         text:
+    label_year_singular:
+      name: Singular Year Label
+      description: Label to use when years_ago == 1.
+      default: "year"
+      selector:
+        text:
+    label_year_plural:
+      name: Plural Years Label
+      description: Label to use when years_ago != 1.
+      default: "years"
+      selector:
+        text:
     notification_icon:
       name: Notification Icon
       description: |
@@ -140,6 +152,8 @@ action:
       asset_selection_mode: !input asset_selection_mode
       notification_icon: !input notification_icon
       notification_channel: !input notification_channel
+      label_year_singular: !input label_year_singular
+      label_year_plural: !input label_year_plural
   - action: rest_command.immich_get_memories
     data:
       api_url: "{{ api_url }}"
@@ -199,7 +213,12 @@ action:
           {% endif %}
         {% endif %}
       years_ago: "{{ now().year - selected_memory.data.year if selected_memory != none else 0 }}"
-      years_ago_label: "{{ 'year' if (years_ago|int) == 1 else 'years' }}"
+      years_ago_label: >-
+        {% if years_ago|int == 1 %}
+          {{ label_year_singular }}
+        {% else %}
+          {{ label_year_plural }}
+        {% endif %}
       memory_year: "{{ selected_memory.data.year if selected_memory != none else '' }}"
   - choose:
       - conditions:
