@@ -47,7 +47,7 @@ Add the following snippet to your `configuration.yaml`:
 ```yaml
 rest_command:
   immich_get_memories:
-    url: "{{ api_url }}/api/memories?for={{ now().strftime('%Y-%m-%dT00:00:00.000Z') }}"
+    url: "{{ api_url }}/api/memories?for={{ now().strftime('%Y-%m-%d') }}"
     method: GET
     headers:
       Accept: "application/json"
